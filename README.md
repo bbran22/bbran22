@@ -1,5 +1,5 @@
-## Hello-world
-My name is Brandon Mowatt and I can't wait to learn more about GitHub with all of you!
-This is my first time editing a new branch on this site.
-This special repository is for practice only.
+## Flight Finder
+Flight Finder is a search app that allows the user to enter a departure airport,
+search a pre-defined database,
+and display matching flights.
 This edit is only for README file.
