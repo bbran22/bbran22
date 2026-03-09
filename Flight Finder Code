@@ -1,0 +1,60 @@
+import androidx.compose.runtime.Composable
+
+// Airport.kt - Entity
+@Entity(tableName = "airport")
+data class Airport(
+        @PrimaryKey val id: Int,
+        @ColumnInfo(name = "iata_code") val iataCode: String,
+        @ColumnInfo(name = "airport_name") val airportName: String,
+        val passengers: int
+)
+
+// Flight.kt - Entity (pre-defined data)
+@Entity(tableName = "flight")
+data class Flight(
+    @PrimaryKey val id: Int,
+    @ColumnInfo(name = "departure_code") val departureCode: String,
+    @ColumnInfo(name = "destination_code") val destinationCode: String,
+    @ColumnInfo(name = "flight_number") val flightNumber: String
+)
+
+class FlightViewModel(private val repository: FlightRepository) : ViewModel() {
+    var searchQuery by mutableStateOf("")
+
+    // Flows to hold results
+    val searchResults = repository.getFlightsByDeparture(searchQuery)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun updateSearch(newQuery: String) {
+        searchQuery = newQuery
+    }
+}
+
+@Composable
+fun FlightSearchScreen(viewModel: FlightViewModel) {
+    Column {
+        TextField(
+            value = viewModel.searchQuery,
+            onValueChange = { viewModel.updateSearch(it) },
+            label = { Text("Enter Departure Airport (e.g., JFK)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        LazyColum {
+            items(viewModel.searchResults.value) { flight ->
+                FlightItem(flight)
+            }
+        }
+    }
+}
+
+@Composable
+fun FlightItem(flight: Flight) {
+    Card(modifier = Modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(16.dp)) {
+            Text(text = "${flight.departureCode} -> ${flight.destinationCode}")
+            Spacer(modifier = Modifier.weight(1f))
+            Text(text = "Flight: ${flight.flightNumber}")
+        }
+    }
+}
